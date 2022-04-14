@@ -1,0 +1,35 @@
+<template>
+    <lightning-card icon-name="standard:record_lookup" title="Lookup Tool">
+        <!-- <div class="slds-align_absolute-center" style="height:12rem"> -->
+            <ul>
+                <li>
+                    <div class="slds-box slds-theme--default">
+                        <lightning-combobox
+                            name="SObject Type"
+                            label="Select Object Type"
+                            value=""
+                            placeholder="Select Type"
+                            options={options}
+                            onchange={handleChange}
+                            style="color:blue;width:200px;"
+                            required>
+                        </lightning-combobox>
+                    </div></li><br><br>
+                <li><template if:true={showFileUpload}>
+                    <lightning-card icon-name="custom:custom19" title={title}>
+                        <div style="margin-left: 3%">
+                            <div if:true={showSpinner} class="slds-is-relative">
+                                <lightning-spinner alternative-text="Loading, please wait..." variant="brand" size="medium"> </lightning-spinner>
+                            </div>
+                            <lightning-file-upload accept={acceptedCSVFormats} label="Upload File" onuploadfinished={uploadFileHandler} ></lightning-file-upload>
+                        </div>
+                        <div if:true={error}>Error: {error}</div><br/>
+                        <template if:true={showResults}>
+                            <c-domain-lookup-results tab-type={tabType} document-id={documentId} show-spinner={showSpinner} onshowspinner={handleShowSpinner}></c-domain-lookup-results>
+                        </template>
+                    </lightning-card>
+                </template></li>
+            </ul>
+        <!-- </div> -->
+    </lightning-card>
+</template>

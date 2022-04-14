@@ -1,0 +1,93 @@
+<template>
+    <template if:true={lookupresult}>
+        <div if:true={showSpinner} class="slds-is-relative">
+            <lightning-spinner alternative-text="Loading, please wait..." variant="brand" size="medium"> </lightning-spinner>
+        </div>
+        <lightning-tabset>
+            <div if:true={error} class="slds-box slds-theme_alert-texture slds-theme_warning">
+                <c-error-panel friendly-message={friendlyMessage} errors={error}></c-error-panel>
+            </div>
+            <lightning-tab label={lookupresult.matchedDataLabel} onactive={handleTabClick}>
+                <lightning-button-group class="slds-float_right">
+                    <template if:true={lookupresult.changeOwnerEnabled}><lightning-button class="slds-button slds-button_brand" label="Change Owner" onclick={handleOwnerChange} variant="brand"></lightning-button>&nbsp;</template>
+                    <template if:true={lookupresult.roundRobinEnabled}><lightning-button class="slds-button slds-button_brand" label="Assign Round Robin" onclick={handleRoundRobin} variant="brand"></lightning-button>&nbsp;</template>
+                    <template if:true={lookupresult.createTopicsEnabled}><lightning-button class="slds-button slds-button_brand" label="Add to Topic" onclick={handleAddtoTopic} variant="brand"></lightning-button>&nbsp;</template>
+                    <template if:true={lookupresult.createCampaignsEnabled}><lightning-button class="slds-button slds-button_brand" label="Add to Campaign" onclick={handleAddtoCampiagn} variant="brand"></lightning-button>&nbsp;</template>
+                    <template if:true={lookupresult.exportCSVEnabled}><lightning-button class="slds-button slds-button_brand" label="Export CSV" onclick={downloadCSVFile} variant="brand"></lightning-button>&nbsp;</template>
+                </lightning-button-group><br><br><br>
+                    <c-lwc-datatable-utility 
+                        records={matchedData} 
+                        total-records={matchedData.length} 
+                        columns = {matchedColumns}
+                        key-field="Id"
+                        show-search-box="true"            
+                        max-row-selection={matchedData.length}
+                        onsave={handleSave}
+                        draft-values={draftValues}
+                        onpaginatorchange={handlePaginatorChange}
+                        onsetselectedrecords={handleAllSelectedRows}
+                        table-height="600"
+                        user-messages={usermessage}
+                        if:true={matchedData}>
+                    </c-lwc-datatable-utility>  
+            </lightning-tab>
+            <lightning-tab label={lookupresult.unMatchedDataLabel} onactive={handleTabClick}>
+                <template if:true={lookupresult.createAccountsEnabled}><lightning-button class="slds-float_right slds-button slds-button_brand" label="Create Accounts" onclick={createAccounts} variant="brand"></lightning-button>&nbsp;<br><br><br></template>
+                <template if:true={lookupresult.createLeadsEnabled}><lightning-button class="slds-float_right slds-button slds-button_brand" label="Create Leads" onclick={createLeads} variant="brand"></lightning-button>&nbsp;<br><br><br></template>
+                <c-lwc-datatable-utility 
+                    records={unmatchedData} 
+                    total-records={unmatchedData.length} 
+                    columns = {unMatchedColumns}
+                    key-field="Name"
+                    max-row-selection={unmatchedData.length}
+                    onpaginatorchange={handlePaginatorChange}
+                    onsetselectedrecords={handleAllSelectedRows}
+                    ongetselectedrecords={handleGetSelectedRows}
+                    table-height="600"
+                    user-messages={usermessage}
+                    if:true={unmatchedData}>
+                </c-lwc-datatable-utility>  
+            </lightning-tab>
+            <template if:true={openModal}> 
+                <div class="demo-only" style="height: 640px;">
+                    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+                        <div class="slds-modal__container">
+                            <header class="slds-modal__header">
+                                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                                    <lightning-icon icon-name="utility:close" size="medium">
+                                    </lightning-icon>
+                                    <span class="slds-assistive-text">Close</span>
+                                </button>
+                                <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">{modalHeader}</h2>
+                            </header>
+                            <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                                <!-- <center> -->
+                                    <h2><b> 
+                                        <!-- selection={initialSelection} -->
+                                        <c-lookup
+                                            errors={errors}
+                                            onsearch={handleLookupSearch}
+                                            onselectionchange={handleLookupSelectionChange}
+                                            label="Search"
+                                            placeholder="Search Salesforce"
+                                            is-multi-entry={isMultiEntry}
+                                            sobject-type={searchSObject}
+                                            required>
+                                        </c-lookup>
+                                        
+                                    </b></h2><br/>
+                                <!-- </center> -->
+                            </div>
+                            <footer class="slds-modal__footer">
+                                <lightning-button label="Cancel" variant="neutral" onclick={closeModal}></lightning-button>&nbsp;&nbsp;&nbsp;&nbsp;
+                                <lightning-button label="Confirm" variant="brand" onclick={confirmTheSearchEntry}></lightning-button>
+                            </footer>
+                        </div>
+                    </section>
+                    <div class="slds-backdrop slds-backdrop_open"></div>
+                </div>
+            </template>
+    
+        </lightning-tabset>
+    </template>
+</template>
